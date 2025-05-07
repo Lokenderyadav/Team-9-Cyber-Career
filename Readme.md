@@ -1,78 +1,206 @@
-# Cyber Career Advisory Dashboard
-Empowering cyber career advisors with real-time job market insights using Power BI.
 
-## Project Description
-The **Cyber Career Advisory Dashboard** is designed to help cyber career advisors in educational institutions guide students and recent graduates more effectively by providing real-time, data-driven insights into job market trends, in-demand skills, and industry demands. 
+# 📊 Cybersecurity Job Dashboard - ReadMe
 
-By centralizing fragmented job market data, this Power BI solution ensures that career advice is current, relevant, and aligned with industry needs.
+## 📁 Project Overview
+The **Cybersecurity Job Dashboard** is an interactive Power BI application designed to help job seekers, career advisors, and hiring managers understand the cybersecurity job market using data visualizations and metrics. The dashboard provides deep insights into job availability, salary trends, experience level impact, remote work opportunities, domain specialization, and certification value.
 
-##  Table of Contents
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Dashboard Preview](#dashboard-preview)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+This project was developed as part of the Master's Research Project under the guidance of Professor Maria Weber.
 
-##  Installation
-1. Clone the repository:
-   
-   git clone https://github.com/Lokenderyadav/Team-9-Cyber-Career.git
-   cd Career-Advisory-Dashboard
-   
+---
 
-2. Set up a virtual environment if using Python scripts for ETL:
-   
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   
+## 👥 Team Members and Contributions
 
-3. Open the Power BI `.pbix` file in Power BI Desktop.
+| Team Member Name         | Contribution Area                                      |
+|--------------------------|--------------------------------------------------------|
+| **Aravind Kamuni**       | Power BI dashboard design, employment type analysis    |
+| **Aravind Reddy Manda**  | Certification analytics, satisfaction trends           |
+| **Lokender Yadav**       | Remote work and clearance analysis, visual validation  |
+| **Prudhviraj Kancharla** | Key influencer model, year-wise trends                 |
+| **Rajesh Kandukuri**     | Data validation using Python, domain analysis          |
+| **Satish Kumar Kalla**   | Presentation, ER diagram design                        |
 
-4. Ensure data sources (e.g., job board APIs, CSVs, or SQL Server) are configured and credentials are set.
+---
 
-## Usage
-1. Load the dashboard in Power BI Desktop or publish to Power BI Service.
-2. Use slicers to filter by job roles, industries, salary ranges, or skills.
-3. Generate exportable reports for student advising sessions.
+## 🧾 Dataset Summary
 
+The dataset used was sourced from [Kaggle](https://www.kaggle.com/datasets/dannyrevaldo/salary-cyber-security-jobs) and includes over 2,500 cybersecurity job listings across various countries, roles, and employment types. The enhanced version was cleaned and transformed for quality assurance.
 
-# If applicable, run data pipeline scripts (example)
-python extract_jobs.py
-python transform_skills.py
+Key Fields:
+- `job_title`, `salary_in_usd`, `experience_level`, `employment_type`
+- `remote_ratio`, `Security Clearance Required`, `Certifications Preferred`
+- `Primary Cybersecurity Domain`, `work_year`, `Job Satisfaction Rating`
 
+---
 
-## Features
-- Real-time job trend visualization
-- In-demand skill analysis (technical + soft)
-- Salary benchmarks across roles & industries
-- Industry-wise hiring activity breakdown
-- Interactive filters, timelines, and role-based insights
-- Exportable reports for advisor-student meetings
+## 🧪 Data Validation and Transformation
 
-## Dashboard Preview
-[![Dashboard Screenshot](images/dashboard-preview.png)](we will update once we publish)
+Performed in Python using Pandas (see `data_validation.py`). Steps included:
+- Null/missing value check
+- Salary and remote ratio validation
+- Valid values for `experience_level`, `employment_type`, etc.
+- Duplicate row removal
+- Standardization of categorical values
 
-## Project Structure
+Validation confirmed:
+- No missing values
+- Valid salary and remote ratios
+- No duplicate records
 
-Career-Advisory-Dashboard/
-├── data/                     # Raw and processed data
-├── src/                      # Python ETL scripts (if used)
-├── dashboard/                # Power BI .pbix file
-├── images/                   # Screenshots for documentation
-├── README.md
-└── LICENSE
+---
 
+## 🛠️ Project Structure
 
-## Contributing
-Pull requests are welcome! For major changes, please open an issue first to discuss what you'd like to change.
+```
+Cybersecurity-Job-Dashboard/
+├── Enhanced_Cybersecurity_Job_Dataset.csv
+├── data_validation.py
+├── Cybersecurity Job Dashboard.pbix
+├── Cybersecurity Job Dashboard.pdf
+├── Traceability Matrix.pdf
+├── ER-Diagram.pdf
+├── Presentation.pdf
+└── README.md
+```
 
-## License
-MIT License. See [LICENSE](LICENSE) for details.
+---
 
-## Acknowledgements
-- [Microsoft Fabric Community](https://community.fabric.microsoft.com/)
-- [Marty Nemko – Career Counseling](https://www.martynemko.com/)
-- [Jeffrey Poulos – Future of Career Advising](https://www.linkedin.com/pulse/future-career-advising-jeffrey-poulos-m-a-cprw-n5lpe)
+## 🧠 Application Features
+
+### 1. 🌍 Country-Wise Job and Salary Insights
+**Visuals:** Clustered bar chart - Count of job titles & average salary by location  
+**DAX Used:**
+```dax
+Average Salary By Country = 
+AVERAGEX(
+    VALUES('JobData'[company_location]),
+    CALCULATE(AVERAGE('JobData'[salary_in_usd]))
+)
+```
+
+### 2. 🔍 Salary Influencers by Experience and Remote Ratio
+**Visuals:** Key Influencer chart using `experience_level`, `remote_ratio`  
+**DAX Used:**
+```dax
+Avg Salary Influencers = AVERAGE('JobData'[salary_in_usd])
+```
+
+### 3. 🧑‍💼 Top Paying Roles Over $100K
+**Visuals:** Bar chart for top 5 highest paid roles  
+**DAX Used:**
+```dax
+Top Paying Roles = 
+TOPN(
+    5,
+    SUMMARIZE('JobData', 'JobData'[job_title], "AvgSalary", AVERAGE('JobData'[salary_in_usd])),
+    [AvgSalary], DESC
+)
+```
+
+### 4. 📈 Salary Trends Over Time
+**Visuals:** Line chart over `work_year`  
+**DAX Used:**
+```dax
+YOY Salary Growth = 
+VAR PrevYear = CALCULATE(AVERAGE('JobData'[salary_in_usd]), PREVIOUSYEAR('JobData'[work_year]))
+RETURN DIVIDE([Average Salary] - PrevYear, PrevYear)
+```
+
+### 5. 🛡️ Security Clearance Insights
+**Visuals:** Pie chart + bar chart on salary by clearance type  
+**DAX Used:**
+```dax
+% Jobs Requiring Clearance = 
+DIVIDE(
+    COUNTROWS(FILTER('JobData', 'JobData'[Security Clearance Required] <> "No")),
+    COUNTROWS('JobData')
+) * 100
+```
+
+### 6. 🏠 Remote Work Availability & Salary Comparison
+**Visuals:** Bar chart and KPIs comparing salaries for remote/hybrid/onsite  
+**DAX Used:**
+```dax
+% Fully Remote Jobs = 
+DIVIDE(
+    COUNTROWS(FILTER('JobData', 'JobData'[Remote Work Availability] = "Yes")),
+    COUNTROWS('JobData')
+) * 100
+```
+
+### 7. 🎓 Certifications and Their Impact
+**Visuals:** Count of jobs & average salary per certification, trend line over years  
+**DAX Used:**
+```dax
+Avg Salary by Cert = 
+AVERAGEX(
+    VALUES('JobData'[Certifications Preferred]),
+    CALCULATE(AVERAGE('JobData'[salary_in_usd]))
+)
+```
+
+### 8. 🧭 Cybersecurity Domain Analysis
+**Visuals:** Domain-wise job distribution, average salary, and growth trend  
+**DAX Used:**
+```dax
+Domain Salary = 
+AVERAGEX(
+    VALUES('JobData'[Primary Cybersecurity Domain]),
+    CALCULATE(AVERAGE('JobData'[salary_in_usd]))
+)
+```
+
+---
+
+## 🖼️ Screenshot Highlights
+
+### 🔸 Dashboard: Country-wise Metrics
+
+<img width="1263" alt="Screenshot 2025-05-06 at 10 09 55 PM" src="https://github.com/user-attachments/assets/c47fdb53-a861-4a64-a1ec-2437e4144bbf" />
+
+### 🔸 Dashboard: Salary by Certification
+
+<img width="1263" alt="Screenshot 2025-05-06 at 10 10 30 PM" src="https://github.com/user-attachments/assets/97cf885c-a80d-4e61-ae56-421eaaaeabb9" />
+
+<img width="1263" alt="Screenshot 2025-05-06 at 10 12 37 PM" src="https://github.com/user-attachments/assets/71ba2e47-4568-48d3-ac1a-311f086657a3" />
+
+### 🔸 Dashboard: Remote vs Onsite Work Analysis and Clerance
+
+<img width="1263" alt="Screenshot 2025-05-06 at 10 10 59 PM" src="https://github.com/user-attachments/assets/00250e54-eda7-4772-9ffb-452b116d4eca" />
+
+### 🔸 Dashboard: Domains and CyberSecurity Fields
+
+<img width="1263" alt="Screenshot 2025-05-06 at 10 13 00 PM" src="https://github.com/user-attachments/assets/1020413a-633d-49ae-9aa6-4f74137f119e" />
+
+---
+
+## 🧾 Files Included in the Submission
+
+| File Name                               | Description                                    |
+|-----------------------------------------|------------------------------------------------|
+| `Enhanced_Cybersecurity_Job_Dataset.csv`| Final cleaned dataset                         |
+| `data_validation.py`                    | Python script for data integrity checks       |
+| `Cybersecurity Job Dashboard.pbix`      | Final Power BI Dashboard                      |
+| `Cybersecurity Job Dashboard.pdf`       | PDF Export of Dashboard                       |
+| `Traceability Matrix.pdf`               | Validation against project requirements       |
+| `Presentation.pdf`                      | Final Presentation Deck                       |
+| `ER-Diagram.pdf`                        | ER model used for planning (optional concept) |
+
+---
+
+## 🚀 Future Enhancements
+
+- Real-time job market integration using API-based job feeds (e.g., LinkedIn, Indeed)
+- Predictive analytics to forecast role demand and skill gaps
+- Resume matcher feature using NLP
+- Dynamic storytelling with guided walkthroughs
+
+---
+
+## 📬 Contact
+
+For questions or access to this dashboard:
+> Contact any team member or Professor Maria Weber at [SLU Faculty]
+
+---
+
+© 2025 | Team 9 | Saint Louis University – Health Informatics & Analytics
